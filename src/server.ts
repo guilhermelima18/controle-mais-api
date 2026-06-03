@@ -4,6 +4,8 @@ import fastifyJwt from "@fastify/jwt";
 
 import { authRoutes } from "./routes/auth";
 import { usersRoutes } from "./routes/users";
+import { transactionsRoutes } from "./routes/transactions";
+import { categoriesRoutes } from "./routes/categories";
 
 const app = Fastify();
 
@@ -16,6 +18,8 @@ app.register(fastifyJwt, {
 // Rotas
 app.register(authRoutes, { prefix: "/v1/auth" });
 app.register(usersRoutes, { prefix: "/v1/users" });
+app.register(transactionsRoutes, { prefix: "/v1/transactions" });
+app.register(categoriesRoutes, { prefix: "/v1/categories" });
 
 app.decorate(
   "authenticate",
