@@ -36,8 +36,9 @@ model Transaction {
 }
 
 model Category {
-    id           String        @id @default(uuid())
-    name         String        @unique
+    id           String          @id @default(uuid())
+    name         String          @unique
+    type         TransactionType
     transactions Transaction[]
 }
 

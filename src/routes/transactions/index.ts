@@ -3,6 +3,17 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { TransactionsController } from "../../controllers/transactions";
 
 export async function transactionsRoutes(fastify: FastifyInstance) {
+  fastify.get(
+    "/list",
+    {
+      onRequest: [fastify.authenticate],
+    },
+    (request: FastifyRequest, reply: FastifyReply) => {
+      const transactionsController = new TransactionsController();
+      return transactionsController.listByFilters(request, reply);
+    },
+  );
+
   fastify.post(
     "/",
     {

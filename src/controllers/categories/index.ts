@@ -5,6 +5,7 @@ import { CategoriesService } from "../../services/categories";
 
 const createCategorySchema = z.object({
   name: z.string("O campo nome é obrigatório!"),
+  type: z.string("O campo tipo é obrigatório!"),
 });
 
 export class CategoriesController {
@@ -54,6 +55,7 @@ export class CategoriesController {
       const categoriesService = new CategoriesService();
       await categoriesService.create({
         name: data.name,
+        type: data.type as "INCOME" | "EXPENSE",
       });
 
       return reply

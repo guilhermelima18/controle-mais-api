@@ -3,6 +3,12 @@ import z from "zod";
 
 import { TransactionsService } from "../../services/transactions";
 
+const listTransactionsByFiltersSchema = z.object({
+  search: z.string().optional(),
+  type: z.string().optional(),
+  category: z.string().optional(),
+});
+
 const createTransactionSchema = z.object({
   description: z.string("O campo descrição é obrigatório!"),
   amount: z.number("O campo valor é obrigatório!"),
@@ -13,6 +19,35 @@ const createTransactionSchema = z.object({
 });
 
 export class TransactionsController {
+  async listByFilters(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const { success, data, error } =
+        listTransactionsByFiltersSchema.safeParse(request.query);
+
+      if (!success) {
+        return reply.code(400).send({
+          errors: error.issues.map((issue) => ({
+            campo: issue.path[0],
+            message: issue.message,
+          })),
+        });
+      }
+
+      const transactionsService = new TransactionsService();
+      const transactions = await transactionsService.listByFilters({
+        search: data.search,
+        categoryId: data.category,
+        type: data.type,
+        user: request.user as { name: string; sub: string },
+      });
+
+      return reply.code(200).send(transactions);
+    } catch (error) {
+      console.log(error);
+      return reply.status(500).send({ error: "Erro interno do servidor." });
+    }
+  }
+
   async create(request: FastifyRequest, reply: FastifyReply) {
     try {
       const { success, data, error } = createTransactionSchema.safeParse(

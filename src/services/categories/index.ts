@@ -2,6 +2,7 @@ import { prisma } from "../../libs/prisma";
 
 type CategoriesCreate = {
   name: string;
+  type: "INCOME" | "EXPENSE";
 };
 
 export class CategoriesService {
@@ -23,10 +24,11 @@ export class CategoriesService {
     return categoryExists;
   }
 
-  async create({ name }: CategoriesCreate) {
+  async create({ name, type }: CategoriesCreate) {
     return await prisma.category.create({
       data: {
         name,
+        type,
       },
     });
   }
