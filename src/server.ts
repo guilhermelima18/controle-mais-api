@@ -3,9 +3,18 @@ import cors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
 
 import { authRoutes } from "./routes/auth";
-import { usersRoutes } from "./routes/users";
-import { transactionsRoutes } from "./routes/transactions";
-import { categoriesRoutes } from "./routes/categories";
+
+import { usersListRoute } from "./routes/users/users-list.route";
+import { userListRoute } from "./routes/users/user-list.route";
+import { userCreateRoute } from "./routes/users/user-create.route";
+
+import { transactionsListFiltersRoute } from "./routes/transactions/transactions-list-filters.route";
+import { transactionCreateRoute } from "./routes/transactions/transaction-create.route";
+import { transactionDeleteRoute } from "./routes/transactions/transaction-delete.route";
+
+import { categoriesListRoute } from "./routes/categories/categories-list.route";
+import { categoryListRoute } from "./routes/categories/category-list.route";
+import { categoryCreateRoute } from "./routes/categories/category-create.route";
 
 const app = Fastify();
 
@@ -16,10 +25,23 @@ app.register(fastifyJwt, {
 });
 
 // Rotas
+// Autenticação
 app.register(authRoutes, { prefix: "/v1/auth" });
-app.register(usersRoutes, { prefix: "/v1/users" });
-app.register(transactionsRoutes, { prefix: "/v1/transactions" });
-app.register(categoriesRoutes, { prefix: "/v1/categories" });
+
+// Usuários
+app.register(usersListRoute, { prefix: "/v1/users" });
+app.register(userListRoute, { prefix: "/v1/users" });
+app.register(userCreateRoute, { prefix: "/v1/users" });
+
+// Transações
+app.register(transactionsListFiltersRoute, { prefix: "/v1/transactions" });
+app.register(transactionCreateRoute, { prefix: "/v1/transactions" });
+app.register(transactionDeleteRoute, { prefix: "/v1/transactions" });
+
+// Categorias
+app.register(categoriesListRoute, { prefix: "/v1/categories" });
+app.register(categoryListRoute, { prefix: "/v1/categories" });
+app.register(categoryCreateRoute, { prefix: "/v1/categories" });
 
 app.decorate(
   "authenticate",
