@@ -9,6 +9,7 @@ import { userListRoute } from "./routes/users/user-list.route";
 import { userCreateRoute } from "./routes/users/user-create.route";
 
 import { transactionsListFiltersRoute } from "./routes/transactions/transactions-list-filters.route";
+import { transactionsListDashboardRoute } from "./routes/transactions/transactions-list-dashboard.route";
 import { transactionCreateRoute } from "./routes/transactions/transaction-create.route";
 import { transactionDeleteRoute } from "./routes/transactions/transaction-delete.route";
 
@@ -35,6 +36,7 @@ app.register(userCreateRoute, { prefix: "/v1/users" });
 
 // Transações
 app.register(transactionsListFiltersRoute, { prefix: "/v1/transactions" });
+app.register(transactionsListDashboardRoute, { prefix: "/v1/transactions" });
 app.register(transactionCreateRoute, { prefix: "/v1/transactions" });
 app.register(transactionDeleteRoute, { prefix: "/v1/transactions" });
 
