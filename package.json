@@ -12,7 +12,6 @@
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
   },
-  "type": "module",
   "dependencies": {
     "@fastify/cors": "^11.2.0",
     "@fastify/jwt": "^10.0.0",
@@ -28,11 +27,11 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
-    "@types/node": "^25.4.0",
+    "@types/node": "^22.10.1",
     "@types/pg": "^8.18.0",
     "prisma": "^7.4.2",
-    "tsup": "^8.5.1",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
   }
 }
