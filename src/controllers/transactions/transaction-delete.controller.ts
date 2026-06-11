@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
 
-import { TransactionDeleteService } from "@/services/transactions/transaction-delete.service";
+import { TransactionDeleteService } from "../../services/transactions/transaction-delete.service";
 
 const transactionDeleteSchema = z.object({
   id: z.string("O campo id é obrigatório!"),

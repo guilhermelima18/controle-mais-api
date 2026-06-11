@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { TransactionCreateController } from "@/controllers/transactions/transaction-create.controller";
+import { TransactionCreateController } from "../../controllers/transactions/transaction-create.controller";
 
 export async function transactionCreateRoute(fastify: FastifyInstance) {
   fastify.post(

@@ -1,4 +1,4 @@
-import { prisma } from "@/libs/prisma";
+import { prisma } from "../../libs/prisma";
 
 export class TransactionDeleteService {
   async execute({ transactionId }: { transactionId: string }) {

@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 
-import { AuthService } from "@/services/auth";
+import { AuthService } from "../../services/auth";
 
 const authSchema = z.object({
   cpf: z.string("O campo CPF é obrigatório!"),

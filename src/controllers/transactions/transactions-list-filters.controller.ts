@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
-import { TransactionsListFiltersService } from "@/services/transactions/transactions-list-filters.service";
+import { TransactionsListFiltersService } from "../../services/transactions/transactions-list-filters.service";
 
 const listTransactionsByFiltersSchema = z.object({
   search: z.string().optional(),

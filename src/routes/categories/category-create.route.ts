@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { CategoryCreateController } from "@/controllers/categories/category-create.controller";
+import { CategoryCreateController } from "../../controllers/categories/category-create.controller";
 
 export async function categoryCreateRoute(fastify: FastifyInstance) {
   fastify.post(

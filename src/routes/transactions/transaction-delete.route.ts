@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { TransactionDeleteController } from "@/controllers/transactions/transaction-delete.controller";
+import { TransactionDeleteController } from "../../controllers/transactions/transaction-delete.controller";
 
 export async function transactionDeleteRoute(fastify: FastifyInstance) {
   fastify.delete(

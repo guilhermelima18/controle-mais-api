@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { TransactionsListFiltersController } from "@/controllers/transactions/transactions-list-filters.controller";
+import { TransactionsListFiltersController } from "../../controllers/transactions/transactions-list-filters.controller";
 
 export async function transactionsListFiltersRoute(fastify: FastifyInstance) {
   fastify.get(

@@ -1,5 +1,5 @@
 import { startOfMonth, addMonths } from "date-fns";
-import { prisma } from "@/libs/prisma";
+import { prisma } from "../../libs/prisma";
 
 export class TransactionsListDashboardService {
   async execute({

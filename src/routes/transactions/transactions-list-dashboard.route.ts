@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { TransactionsListDashboardController } from "@/controllers/transactions/transactions-list-dashboard.controller";
+import { TransactionsListDashboardController } from "../../controllers/transactions/transactions-list-dashboard.controller";
 
 export async function transactionsListDashboardRoute(fastify: FastifyInstance) {
   fastify.get(

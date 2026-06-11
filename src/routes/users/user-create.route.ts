@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { UserCreateController } from "@/controllers/users/user-create.controller";
+import { UserCreateController } from "../../controllers/users/user-create.controller";
 
 export async function userCreateRoute(fastify: FastifyInstance) {
   fastify.post(

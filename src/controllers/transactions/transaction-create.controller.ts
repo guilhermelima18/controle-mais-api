@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
-import { TransactionCreateService } from "@/services/transactions/transaction-create.service";
+import { TransactionCreateService } from "../../services/transactions/transaction-create.service";
 
 const createTransactionSchema = z.object({
   description: z.string("O campo descrição é obrigatório!"),

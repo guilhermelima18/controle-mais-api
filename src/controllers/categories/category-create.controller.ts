@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
-import { CategoryCreateService } from "@/services/categories/category-create.service";
+import { CategoryCreateService } from "../../services/categories/category-create.service";
 
 const createCategorySchema = z.object({
   name: z.string("O campo nome é obrigatório!"),

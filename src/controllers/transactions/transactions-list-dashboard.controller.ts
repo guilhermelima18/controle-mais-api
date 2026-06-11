@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { TransactionsListDashboardService } from "@/services/transactions/transactions-list-dashboard.service";
+import { TransactionsListDashboardService } from "../../services/transactions/transactions-list-dashboard.service";
 
 export class TransactionsListDashboardController {
   async handle(request: FastifyRequest, reply: FastifyReply) {

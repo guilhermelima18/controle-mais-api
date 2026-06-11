@@ -1,5 +1,5 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { CategoriesListController } from "@/controllers/categories/categories-list.controller";
+import { CategoriesListController } from "../../controllers/categories/categories-list.controller";
 
 export async function categoriesListRoute(fastify: FastifyInstance) {
   fastify.get(

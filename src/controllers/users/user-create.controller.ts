@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
-import { UserCreateService } from "@/services/users/user-create.service";
+import { UserCreateService } from "../../services/users/user-create.service";
 
 const createUserSchema = z.object({
   name: z.string("O campo nome é obrigatório!"),
