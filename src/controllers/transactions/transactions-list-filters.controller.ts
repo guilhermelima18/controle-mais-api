@@ -6,6 +6,8 @@ const listTransactionsByFiltersSchema = z.object({
   search: z.string().optional(),
   type: z.string().optional(),
   category: z.string().optional(),
+  initialDate: z.string().optional(),
+  finalDate: z.string().optional(),
 });
 
 export class TransactionsListFiltersController {
@@ -28,6 +30,8 @@ export class TransactionsListFiltersController {
         search: data.search,
         categoryId: data.category,
         type: data.type,
+        initialDate: data.initialDate,
+        finalDate: data.finalDate,
         user: request.user as { name: string; sub: string },
       });
 

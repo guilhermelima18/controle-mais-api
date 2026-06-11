@@ -1,3 +1,4 @@
+import "dotenv/config";
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
@@ -67,7 +68,7 @@ app.setErrorHandler((error: any, _, reply) => {
 const start = async () => {
   try {
     await app.listen({
-      port: 3333,
+      port: Number(process.env.PORT) || 3333,
       host: "0.0.0.0",
     });
 
