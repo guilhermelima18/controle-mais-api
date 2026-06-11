@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "node -r tsconfig-paths/register dist/server.js",
     "prisma:migrate": "prisma migrate deploy"
   },
   "prisma": {
@@ -23,6 +23,7 @@
     "fastify": "^5.8.2",
     "pg": "^8.20.0",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
