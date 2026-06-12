@@ -8,6 +8,8 @@ const listTransactionsByFiltersSchema = z.object({
   category: z.string().optional(),
   initialDate: z.string().optional(),
   finalDate: z.string().optional(),
+  page: z.string().optional(),
+  perPage: z.string().optional(),
 });
 
 export class TransactionsListFiltersController {
@@ -33,6 +35,8 @@ export class TransactionsListFiltersController {
         initialDate: data.initialDate,
         finalDate: data.finalDate,
         user: request.user as { name: string; sub: string },
+        page: Number(data.page),
+        perPage: Number(data.perPage),
       });
 
       return reply.code(200).send(transactions);

@@ -33,6 +33,7 @@ export class CategoryCreateController {
         .code(201)
         .send({ success: true, message: "Categoria criada com sucesso!" });
     } catch (error: any) {
+      console.log(error);
       return reply.status(500).send({ error: "Erro interno do servidor." });
     }
   }

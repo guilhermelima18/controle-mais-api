@@ -11,7 +11,9 @@ import { userCreateRoute } from "./routes/users/user-create.route";
 
 import { transactionsListFiltersRoute } from "./routes/transactions/transactions-list-filters.route";
 import { transactionsListDashboardRoute } from "./routes/transactions/transactions-list-dashboard.route";
+import { transactionListRoute } from "./routes/transactions/transaction-list";
 import { transactionCreateRoute } from "./routes/transactions/transaction-create.route";
+import { transactionUpdateRoute } from "./routes/transactions/transaction-update.route";
 import { transactionDeleteRoute } from "./routes/transactions/transaction-delete.route";
 
 import { categoriesListRoute } from "./routes/categories/categories-list.route";
@@ -38,7 +40,9 @@ app.register(userCreateRoute, { prefix: "/v1/users" });
 // Transações
 app.register(transactionsListFiltersRoute, { prefix: "/v1/transactions" });
 app.register(transactionsListDashboardRoute, { prefix: "/v1/transactions" });
+app.register(transactionListRoute, { prefix: "/v1/transactions" });
 app.register(transactionCreateRoute, { prefix: "/v1/transactions" });
+app.register(transactionUpdateRoute, { prefix: "/v1/transactions" });
 app.register(transactionDeleteRoute, { prefix: "/v1/transactions" });
 
 // Categorias
@@ -72,7 +76,7 @@ const start = async () => {
       host: "0.0.0.0",
     });
 
-    console.log("Servidor rodando na porta:", 3333);
+    console.log("Servidor rodando na porta:", Number(process.env.PORT) || 3333);
   } catch (error) {
     console.error("Erro ao iniciar servidor:", error);
     process.exit(1);
