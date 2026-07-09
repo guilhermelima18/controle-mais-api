@@ -16,6 +16,7 @@ export interface TransactionProps {
   date: Date;
   userId: string;
   categoryId: string;
+  recurringTransactionId: string | null;
   createdAt: Date;
   category?: TransactionCategory;
 }
@@ -55,6 +56,10 @@ export class Transaction {
     return this.props.categoryId;
   }
 
+  get recurringTransactionId() {
+    return this.props.recurringTransactionId;
+  }
+
   get createdAt() {
     return this.props.createdAt;
   }
@@ -72,6 +77,7 @@ export class Transaction {
       date: this.props.date,
       userId: this.props.userId,
       categoryId: this.props.categoryId,
+      recurringTransactionId: this.props.recurringTransactionId,
       createdAt: this.props.createdAt,
       category: this.props.category,
     };

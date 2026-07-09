@@ -10,6 +10,7 @@ import { authRoutes } from "../../modules/auth/infra/http/routes";
 import { usersRoutes } from "../../modules/users/infra/http/routes";
 import { categoriesRoutes } from "../../modules/categories/infra/http/routes";
 import { transactionsRoutes } from "../../modules/transactions/infra/http/routes";
+import { recurringTransactionsRoutes } from "../../modules/recurring-transactions/infra/http/routes";
 
 export const app = Fastify();
 
@@ -26,6 +27,9 @@ app.register(authRoutes, { prefix: "/v1/auth" });
 app.register(usersRoutes, { prefix: "/v1/users" });
 app.register(transactionsRoutes, { prefix: "/v1/transactions" });
 app.register(categoriesRoutes, { prefix: "/v1/categories" });
+app.register(recurringTransactionsRoutes, {
+  prefix: "/v1/recurring-transactions",
+});
 
 app.setErrorHandler(
   (error: any, _request: FastifyRequest, reply: FastifyReply) => {

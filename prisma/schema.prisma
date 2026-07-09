@@ -17,7 +17,8 @@ model User {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    transactions Transaction[]
+    transactions          Transaction[]
+    recurringTransactions RecurringTransaction[]
 }
 
 model Transaction {
@@ -33,6 +34,9 @@ model Transaction {
     categoryId String
     category   Category @relation(fields: [categoryId], references: [id])
 
+    recurringTransactionId String?
+    recurringTransaction   RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id], onDelete: SetNull)
+
     createdAt DateTime @default(now())
 }
 
@@ -41,9 +45,41 @@ model Category {
     name         String          @unique
     type         TransactionType
     transactions Transaction[]
+
+    recurringTransactions RecurringTransaction[]
+}
+
+model RecurringTransaction {
+    id          String                         @id @default(uuid())
+    description String
+    amount      Decimal                        @db.Decimal(10, 2)
+    type        TransactionType
+    frequency   RecurringTransactionFrequency
+
+    startDate         DateTime
+    endDate           DateTime?
+    lastGeneratedDate DateTime?
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    categoryId String
+    category   Category @relation(fields: [categoryId], references: [id])
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    transactions Transaction[]
 }
 
 enum TransactionType {
     INCOME
     EXPENSE
+}
+
+enum RecurringTransactionFrequency {
+    DAILY
+    WEEKLY
+    MONTHLY
+    YEARLY
 }

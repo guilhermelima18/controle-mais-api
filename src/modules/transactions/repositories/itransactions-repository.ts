@@ -7,6 +7,7 @@ export type TransactionCreateData = {
   date: string;
   userId: string;
   categoryId: string;
+  recurringTransactionId?: string | null;
 };
 
 export type TransactionUpdateData = {
