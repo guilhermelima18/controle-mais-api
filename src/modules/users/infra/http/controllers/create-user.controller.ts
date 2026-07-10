@@ -5,6 +5,7 @@ import { PrismaUsersRepository } from "../../../repositories/prisma/prisma-users
 
 export class CreateUserController {
   async handle(request: FastifyRequest, reply: FastifyReply) {
+    console.log(request.body);
     const { success, data, error } = createUserSchema.safeParse(request.body);
 
     if (!success) {

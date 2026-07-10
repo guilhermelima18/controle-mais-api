@@ -1,5 +1,6 @@
 import { app } from "./app";
 import { env } from "../../config/env";
+import { startScheduledJobs } from "../jobs/scheduler";
 
 const start = async () => {
   try {
@@ -9,6 +10,8 @@ const start = async () => {
     });
 
     console.log("Servidor rodando na porta:", env.port);
+
+    startScheduledJobs();
   } catch (error) {
     console.error("Erro ao iniciar servidor:", error);
     process.exit(1);

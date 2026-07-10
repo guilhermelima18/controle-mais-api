@@ -13,7 +13,11 @@ export class PrismaRecurringTransactionsRepository
     data: RecurringTransactionCreateData,
   ): Promise<RecurringTransaction> {
     const recurringTransaction = await prisma.recurringTransaction.create({
-      data,
+      data: {
+        ...data,
+        startDate: new Date(data.startDate),
+        endDate: data.endDate ? new Date(data.endDate) : data.endDate,
+      },
     });
     return new RecurringTransaction(recurringTransaction);
   }
@@ -24,7 +28,11 @@ export class PrismaRecurringTransactionsRepository
   ): Promise<RecurringTransaction> {
     const recurringTransaction = await prisma.recurringTransaction.update({
       where: { id: recurringTransactionId },
-      data,
+      data: {
+        ...data,
+        startDate: data.startDate ? new Date(data.startDate) : undefined,
+        endDate: data.endDate ? new Date(data.endDate) : data.endDate,
+      },
     });
     return new RecurringTransaction(recurringTransaction);
   }
