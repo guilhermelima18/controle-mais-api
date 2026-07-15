@@ -1,6 +1,7 @@
 import { prisma } from "../../../../infra/database/prisma";
 import { Transaction } from "../../entities/transaction";
 import {
+  DuplicateCheckCandidate,
   ITransactionsRepository,
   TransactionCreateData,
   TransactionFiltersQuery,
@@ -121,6 +122,27 @@ export class PrismaTransactionsRepository implements ITransactionsRepository {
         },
       },
       include: { category: true },
+    });
+
+    return transactions.map((transaction) => new Transaction(transaction));
+  }
+
+  async findManyForDuplicateCheck(
+    userId: string,
+    candidates: DuplicateCheckCandidate[],
+  ): Promise<Transaction[]> {
+    if (candidates.length === 0) {
+      return [];
+    }
+
+    const transactions = await prisma.transaction.findMany({
+      where: {
+        userId,
+        OR: candidates.map((candidate) => ({
+          date: new Date(candidate.date),
+          amount: candidate.amount,
+        })),
+      },
     });
 
     return transactions.map((transaction) => new Transaction(transaction));

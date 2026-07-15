@@ -6,6 +6,7 @@ const create_user_1 = require("../../../use-cases/create-user");
 const prisma_users_repository_1 = require("../../../repositories/prisma/prisma-users-repository");
 class CreateUserController {
     async handle(request, reply) {
+        console.log(request.body);
         const { success, data, error } = create_user_dto_1.createUserSchema.safeParse(request.body);
         if (!success) {
             return reply.code(400).send({

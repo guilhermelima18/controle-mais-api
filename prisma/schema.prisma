@@ -19,6 +19,7 @@ model User {
 
     transactions          Transaction[]
     recurringTransactions RecurringTransaction[]
+    statementImports      StatementImport[]
 }
 
 model Transaction {
@@ -37,6 +38,9 @@ model Transaction {
     recurringTransactionId String?
     recurringTransaction   RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id], onDelete: SetNull)
 
+    extractedTransactionId String?              @unique
+    extractedTransaction   ExtractedTransaction? @relation(fields: [extractedTransactionId], references: [id], onDelete: SetNull)
+
     createdAt DateTime @default(now())
 }
 
@@ -47,6 +51,68 @@ model Category {
     transactions Transaction[]
 
     recurringTransactions RecurringTransaction[]
+    extractedTransactions ExtractedTransaction[]
+}
+
+model StatementImport {
+    id          String                    @id @default(uuid())
+    fileName    String
+    fileFormat  StatementFileFormat
+    fileContent Bytes
+    status      StatementImportStatus     @default(RECEIVED)
+    extractionMethod StatementExtractionMethod?
+    failureReason    String?
+
+    userId String
+    user   User   @relation(fields: [userId], references: [id])
+
+    createdAt   DateTime  @default(now())
+    confirmedAt DateTime?
+
+    extractedTransactions ExtractedTransaction[]
+}
+
+model ExtractedTransaction {
+    id          String          @id @default(uuid())
+    date        DateTime
+    description String
+    amount      Decimal         @db.Decimal(10, 2)
+    type        TransactionType
+    isDuplicate Boolean         @default(false)
+    discarded   Boolean         @default(false)
+
+    statementImportId String
+    statementImport   StatementImport @relation(fields: [statementImportId], references: [id])
+
+    categoryId String?
+    category   Category? @relation(fields: [categoryId], references: [id])
+
+    createdAt DateTime @default(now())
+
+    transaction Transaction?
+}
+
+enum StatementFileFormat {
+    PDF
+    XLSX
+    CSV
+    OFX
+    BBT
+    TXT
+}
+
+enum StatementImportStatus {
+    RECEIVED
+    PROCESSING
+    READY_FOR_REVIEW
+    NO_TRANSACTIONS_FOUND
+    CONFIRMED
+    FAILED
+}
+
+enum StatementExtractionMethod {
+    AI
+    FALLBACK
 }
 
 model RecurringTransaction {

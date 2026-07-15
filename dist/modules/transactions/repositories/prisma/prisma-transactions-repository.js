@@ -91,5 +91,20 @@ class PrismaTransactionsRepository {
         });
         return transactions.map((transaction) => new transaction_1.Transaction(transaction));
     }
+    async findManyForDuplicateCheck(userId, candidates) {
+        if (candidates.length === 0) {
+            return [];
+        }
+        const transactions = await prisma_1.prisma.transaction.findMany({
+            where: {
+                userId,
+                OR: candidates.map((candidate) => ({
+                    date: new Date(candidate.date),
+                    amount: candidate.amount,
+                })),
+            },
+        });
+        return transactions.map((transaction) => new transaction_1.Transaction(transaction));
+    }
 }
 exports.PrismaTransactionsRepository = PrismaTransactionsRepository;

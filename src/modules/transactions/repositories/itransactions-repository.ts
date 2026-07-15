@@ -8,6 +8,7 @@ export type TransactionCreateData = {
   userId: string;
   categoryId: string;
   recurringTransactionId?: string | null;
+  extractedTransactionId?: string | null;
 };
 
 export type TransactionUpdateData = {
@@ -39,6 +40,12 @@ export type TransactionFiltersResult = {
   };
 };
 
+export type DuplicateCheckCandidate = {
+  date: string;
+  amount: number;
+  description: string;
+};
+
 export interface ITransactionsRepository {
   create(data: TransactionCreateData): Promise<Transaction>;
   update(
@@ -58,5 +65,9 @@ export interface ITransactionsRepository {
     userId: string,
     startDate: Date,
     endDate: Date,
+  ): Promise<Transaction[]>;
+  findManyForDuplicateCheck(
+    userId: string,
+    candidates: DuplicateCheckCandidate[],
   ): Promise<Transaction[]>;
 }

@@ -1,6 +1,7 @@
 import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
+import fastifyMultipart from "@fastify/multipart";
 
 import { env } from "../../config/env";
 import { AppError } from "../../core/errors/app-error";
@@ -11,6 +12,7 @@ import { usersRoutes } from "../../modules/users/infra/http/routes";
 import { categoriesRoutes } from "../../modules/categories/infra/http/routes";
 import { transactionsRoutes } from "../../modules/transactions/infra/http/routes";
 import { recurringTransactionsRoutes } from "../../modules/recurring-transactions/infra/http/routes";
+import { statementImportsRoutes } from "../../modules/statement-imports/infra/http/routes";
 
 export const app = Fastify();
 
@@ -18,6 +20,9 @@ export const app = Fastify();
 app.register(cors);
 app.register(fastifyJwt, {
   secret: env.jwtSecret,
+});
+app.register(fastifyMultipart, {
+  limits: { fileSize: env.statementImportMaxFileSizeBytes },
 });
 
 app.decorate("authenticate", ensureAuthenticated);
@@ -30,6 +35,7 @@ app.register(categoriesRoutes, { prefix: "/v1/categories" });
 app.register(recurringTransactionsRoutes, {
   prefix: "/v1/recurring-transactions",
 });
+app.register(statementImportsRoutes, { prefix: "/v1/statement-imports" });
 
 app.setErrorHandler(
   (error: any, _request: FastifyRequest, reply: FastifyReply) => {

@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { Decimal } from "@prisma/client/runtime/client";
 import { Transaction } from "../../../../src/modules/transactions/entities/transaction";
 import {
+  DuplicateCheckCandidate,
   ITransactionsRepository,
   TransactionCreateData,
   TransactionFiltersQuery,
@@ -22,6 +23,7 @@ export class InMemoryTransactionsRepository implements ITransactionsRepository {
       userId: data.userId,
       categoryId: data.categoryId,
       recurringTransactionId: data.recurringTransactionId ?? null,
+      extractedTransactionId: data.extractedTransactionId ?? null,
       createdAt: new Date(),
     });
 
@@ -49,6 +51,7 @@ export class InMemoryTransactionsRepository implements ITransactionsRepository {
       userId: current.userId,
       categoryId: data.categoryId ?? current.categoryId,
       recurringTransactionId: current.recurringTransactionId,
+      extractedTransactionId: current.extractedTransactionId,
       createdAt: current.createdAt,
     });
 
@@ -124,6 +127,21 @@ export class InMemoryTransactionsRepository implements ITransactionsRepository {
         item.userId === userId &&
         item.date >= startDate &&
         item.date < endDate,
+    );
+  }
+
+  async findManyForDuplicateCheck(
+    userId: string,
+    candidates: DuplicateCheckCandidate[],
+  ): Promise<Transaction[]> {
+    return this.items.filter(
+      (item) =>
+        item.userId === userId &&
+        candidates.some(
+          (candidate) =>
+            item.date.getTime() === new Date(candidate.date).getTime() &&
+            Number(item.amount) === candidate.amount,
+        ),
     );
   }
 }

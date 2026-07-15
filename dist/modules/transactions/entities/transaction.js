@@ -29,6 +29,9 @@ class Transaction {
     get recurringTransactionId() {
         return this.props.recurringTransactionId;
     }
+    get extractedTransactionId() {
+        return this.props.extractedTransactionId;
+    }
     get createdAt() {
         return this.props.createdAt;
     }
@@ -45,6 +48,7 @@ class Transaction {
             userId: this.props.userId,
             categoryId: this.props.categoryId,
             recurringTransactionId: this.props.recurringTransactionId,
+            extractedTransactionId: this.props.extractedTransactionId,
             createdAt: this.props.createdAt,
             category: this.props.category,
         };

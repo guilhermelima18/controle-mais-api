@@ -48,7 +48,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.RecurringTransactionScalarFieldEnum = exports.CategoryScalarFieldEnum = exports.TransactionScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
+exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.RecurringTransactionScalarFieldEnum = exports.ExtractedTransactionScalarFieldEnum = exports.StatementImportScalarFieldEnum = exports.CategoryScalarFieldEnum = exports.TransactionScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/index-browser"));
 exports.Decimal = runtime.Decimal;
 exports.NullTypes = {
@@ -78,6 +78,8 @@ exports.ModelName = {
     User: 'User',
     Transaction: 'Transaction',
     Category: 'Category',
+    StatementImport: 'StatementImport',
+    ExtractedTransaction: 'ExtractedTransaction',
     RecurringTransaction: 'RecurringTransaction'
 };
 /*
@@ -107,12 +109,37 @@ exports.TransactionScalarFieldEnum = {
     userId: 'userId',
     categoryId: 'categoryId',
     recurringTransactionId: 'recurringTransactionId',
+    extractedTransactionId: 'extractedTransactionId',
     createdAt: 'createdAt'
 };
 exports.CategoryScalarFieldEnum = {
     id: 'id',
     name: 'name',
     type: 'type'
+};
+exports.StatementImportScalarFieldEnum = {
+    id: 'id',
+    fileName: 'fileName',
+    fileFormat: 'fileFormat',
+    fileContent: 'fileContent',
+    status: 'status',
+    extractionMethod: 'extractionMethod',
+    failureReason: 'failureReason',
+    userId: 'userId',
+    createdAt: 'createdAt',
+    confirmedAt: 'confirmedAt'
+};
+exports.ExtractedTransactionScalarFieldEnum = {
+    id: 'id',
+    date: 'date',
+    description: 'description',
+    amount: 'amount',
+    type: 'type',
+    isDuplicate: 'isDuplicate',
+    discarded: 'discarded',
+    statementImportId: 'statementImportId',
+    categoryId: 'categoryId',
+    createdAt: 'createdAt'
 };
 exports.RecurringTransactionScalarFieldEnum = {
     id: 'id',

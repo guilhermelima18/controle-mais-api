@@ -1,0 +1,40 @@
+import * as XLSX from "xlsx";
+import pdfParse from "pdf-parse";
+import { StatementFileFormat } from "../entities/statement-import";
+
+/**
+ * Converte qualquer um dos seis formatos suportados para uma única representação
+ * textual, reaproveitada tanto pelo parser de IA quanto pelo parser determinístico de
+ * fallback (research.md, Decisão 2). PDFs sem camada de texto (escaneados) retornam string
+ * vazia — tratado como "nenhuma transação encontrada" (FR-011), não como erro.
+ */
+export async function extractStatementText(
+  fileBuffer: Buffer,
+  format: StatementFileFormat,
+): Promise<string> {
+  if (format === "PDF") {
+    const result = await pdfParse(fileBuffer);
+    return result.text.trim();
+  }
+
+  if (format === "XLSX") {
+    const workbook = XLSX.read(fileBuffer, { type: "buffer" });
+    return workbook.SheetNames.map((sheetName) =>
+      XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]),
+    ).join("\n");
+  }
+
+  return decodeText(fileBuffer);
+}
+
+function decodeText(fileBuffer: Buffer): string {
+  const utf8Text = fileBuffer.toString("utf-8");
+
+  // Se a decodificação UTF-8 introduziu o caractere de substituição (U+FFFD), o arquivo
+  // provavelmente está em Latin-1 (comum em exports bancários brasileiros mais antigos).
+  if (utf8Text.includes("�")) {
+    return fileBuffer.toString("latin1");
+  }
+
+  return utf8Text;
+}

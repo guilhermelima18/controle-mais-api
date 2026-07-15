@@ -6,6 +6,8 @@ export { app };
 
 export async function cleanDatabase() {
   await prisma.transaction.deleteMany();
+  await prisma.extractedTransaction.deleteMany();
+  await prisma.statementImport.deleteMany();
   await prisma.recurringTransaction.deleteMany();
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
@@ -57,4 +59,30 @@ export async function createCategory(
   });
 
   return category.id;
+}
+
+/**
+ * Monta manualmente um corpo `multipart/form-data` com um único arquivo, para testes e2e
+ * de upload via `app.inject()` (sem depender de uma lib de cliente HTTP externa).
+ */
+export function buildMultipartFilePayload(
+  fileName: string,
+  fileContent: Buffer | string,
+) {
+  const boundary = `----vitest-boundary-${randomUUID()}`;
+
+  const payload = Buffer.concat([
+    Buffer.from(
+      `--${boundary}\r\n` +
+        `Content-Disposition: form-data; name="file"; filename="${fileName}"\r\n` +
+        "Content-Type: application/octet-stream\r\n\r\n",
+    ),
+    Buffer.isBuffer(fileContent) ? fileContent : Buffer.from(fileContent),
+    Buffer.from(`\r\n--${boundary}--\r\n`),
+  ]);
+
+  return {
+    payload,
+    headers: { "content-type": `multipart/form-data; boundary=${boundary}` },
+  };
 }

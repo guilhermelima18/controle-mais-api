@@ -6,14 +6,22 @@ const recurring_transaction_1 = require("../../entities/recurring-transaction");
 class PrismaRecurringTransactionsRepository {
     async create(data) {
         const recurringTransaction = await prisma_1.prisma.recurringTransaction.create({
-            data,
+            data: {
+                ...data,
+                startDate: new Date(data.startDate),
+                endDate: data.endDate ? new Date(data.endDate) : data.endDate,
+            },
         });
         return new recurring_transaction_1.RecurringTransaction(recurringTransaction);
     }
     async update(recurringTransactionId, data) {
         const recurringTransaction = await prisma_1.prisma.recurringTransaction.update({
             where: { id: recurringTransactionId },
-            data,
+            data: {
+                ...data,
+                startDate: data.startDate ? new Date(data.startDate) : undefined,
+                endDate: data.endDate ? new Date(data.endDate) : data.endDate,
+            },
         });
         return new recurring_transaction_1.RecurringTransaction(recurringTransaction);
     }

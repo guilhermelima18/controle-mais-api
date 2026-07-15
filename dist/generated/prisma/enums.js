@@ -9,7 +9,27 @@
 * 🟢 You can import this file directly.
 */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.RecurringTransactionFrequency = exports.TransactionType = void 0;
+exports.RecurringTransactionFrequency = exports.TransactionType = exports.StatementExtractionMethod = exports.StatementImportStatus = exports.StatementFileFormat = void 0;
+exports.StatementFileFormat = {
+    PDF: 'PDF',
+    XLSX: 'XLSX',
+    CSV: 'CSV',
+    OFX: 'OFX',
+    BBT: 'BBT',
+    TXT: 'TXT'
+};
+exports.StatementImportStatus = {
+    RECEIVED: 'RECEIVED',
+    PROCESSING: 'PROCESSING',
+    READY_FOR_REVIEW: 'READY_FOR_REVIEW',
+    NO_TRANSACTIONS_FOUND: 'NO_TRANSACTIONS_FOUND',
+    CONFIRMED: 'CONFIRMED',
+    FAILED: 'FAILED'
+};
+exports.StatementExtractionMethod = {
+    AI: 'AI',
+    FALLBACK: 'FALLBACK'
+};
 exports.TransactionType = {
     INCOME: 'INCOME',
     EXPENSE: 'EXPENSE'
