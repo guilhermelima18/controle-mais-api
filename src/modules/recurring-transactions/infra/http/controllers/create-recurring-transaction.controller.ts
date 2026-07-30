@@ -30,19 +30,23 @@ export class CreateRecurringTransactionController {
         categoriesRepository,
       );
 
-    await createRecurringTransactionUseCase.execute({
-      description: data.description,
-      amount: data.amount,
-      type: data.type as TransactionType,
-      frequency: data.frequency as RecurringTransactionFrequency,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      userId: (request.user as { name: string; sub: string }).sub,
-      categoryId: data.categoryId,
-    });
+    const { recurringTransaction, createdTransactions } =
+      await createRecurringTransactionUseCase.execute({
+        description: data.description,
+        amount: data.amount,
+        type: data.type as TransactionType,
+        frequency: data.frequency as RecurringTransactionFrequency,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        userId: (request.user as { name: string; sub: string }).sub,
+        categoryId: data.categoryId,
+      });
 
-    return reply
-      .code(201)
-      .send({ success: true, message: "Recorrência criada com sucesso!" });
+    return reply.code(201).send({
+      success: true,
+      message: "Recorrência criada com sucesso!",
+      recurringTransaction,
+      createdTransactions,
+    });
   }
 }

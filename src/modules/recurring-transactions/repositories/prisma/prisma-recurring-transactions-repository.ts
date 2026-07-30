@@ -1,9 +1,11 @@
 import { prisma } from "../../../../infra/database/prisma";
 import { RecurringTransaction } from "../../entities/recurring-transaction";
+import { Transaction } from "../../../transactions/entities/transaction";
 import {
   IRecurringTransactionsRepository,
   RecurringTransactionCreateData,
   RecurringTransactionUpdateData,
+  RecurringTransactionWithDueTransactions,
 } from "../irecurring-transactions-repository";
 
 export class PrismaRecurringTransactionsRepository
@@ -20,6 +22,58 @@ export class PrismaRecurringTransactionsRepository
       },
     });
     return new RecurringTransaction(recurringTransaction);
+  }
+
+  async createWithDueTransactions(
+    data: RecurringTransactionCreateData,
+    dueCycles: Date[],
+  ): Promise<RecurringTransactionWithDueTransactions> {
+    return prisma.$transaction(async (tx) => {
+      const recurringTransaction = await tx.recurringTransaction.create({
+        data: {
+          ...data,
+          startDate: new Date(data.startDate),
+          endDate: data.endDate ? new Date(data.endDate) : data.endDate,
+        },
+      });
+
+      const createdTransactions: Transaction[] = [];
+
+      for (const cycleDate of dueCycles) {
+        // Este mapeamento recorrência -> transação DEVE permanecer idêntico ao do
+        // ProcessRecurringTransactionsUseCase: o FR-002/FR-012 da 003 exigem que um
+        // lançamento gerado aqui seja indistinguível de um gerado pelo job.
+        const transaction = await tx.transaction.create({
+          data: {
+            description: recurringTransaction.description,
+            amount: recurringTransaction.amount,
+            type: recurringTransaction.type,
+            date: cycleDate,
+            userId: recurringTransaction.userId,
+            categoryId: recurringTransaction.categoryId,
+            recurringTransactionId: recurringTransaction.id,
+          },
+        });
+        createdTransactions.push(new Transaction(transaction));
+      }
+
+      if (dueCycles.length === 0) {
+        return {
+          recurringTransaction: new RecurringTransaction(recurringTransaction),
+          createdTransactions,
+        };
+      }
+
+      const updated = await tx.recurringTransaction.update({
+        where: { id: recurringTransaction.id },
+        data: { lastGeneratedDate: dueCycles[dueCycles.length - 1] },
+      });
+
+      return {
+        recurringTransaction: new RecurringTransaction(updated),
+        createdTransactions,
+      };
+    });
   }
 
   async update(

@@ -1,16 +1,26 @@
 import { randomUUID } from "node:crypto";
 import { Decimal } from "@prisma/client/runtime/client";
 import { RecurringTransaction } from "../../../../src/modules/recurring-transactions/entities/recurring-transaction";
+import { Transaction } from "../../../../src/modules/transactions/entities/transaction";
 import {
   IRecurringTransactionsRepository,
   RecurringTransactionCreateData,
   RecurringTransactionUpdateData,
+  RecurringTransactionWithDueTransactions,
 } from "../../../../src/modules/recurring-transactions/repositories/irecurring-transactions-repository";
+import { InMemoryTransactionsRepository } from "../transactions/in-memory-transactions-repository";
 
 export class InMemoryRecurringTransactionsRepository
   implements IRecurringTransactionsRepository
 {
   public items: RecurringTransaction[] = [];
+
+  // A implementação Prisma materializa recorrência + transações numa única transação
+  // de banco. Aqui o equivalente é escrever nas duas coleções in-memory; o repositório
+  // de transações é injetado para que o teste possa asseverar sobre os dois lados.
+  constructor(
+    public transactionsRepository: InMemoryTransactionsRepository = new InMemoryTransactionsRepository(),
+  ) {}
 
   async create(
     data: RecurringTransactionCreateData,
@@ -33,6 +43,45 @@ export class InMemoryRecurringTransactionsRepository
 
     this.items.push(recurringTransaction);
     return recurringTransaction;
+  }
+
+  async createWithDueTransactions(
+    data: RecurringTransactionCreateData,
+    dueCycles: Date[],
+  ): Promise<RecurringTransactionWithDueTransactions> {
+    const recurringTransaction = await this.create(data);
+
+    const createdTransactions: Transaction[] = [];
+
+    for (const cycleDate of dueCycles) {
+      createdTransactions.push(
+        await this.transactionsRepository.create({
+          description: recurringTransaction.description,
+          amount: Number(recurringTransaction.amount),
+          type: recurringTransaction.type,
+          date: cycleDate.toISOString(),
+          userId: recurringTransaction.userId,
+          categoryId: recurringTransaction.categoryId,
+          recurringTransactionId: recurringTransaction.id,
+        }),
+      );
+    }
+
+    if (dueCycles.length > 0) {
+      await this.updateLastGeneratedDate(
+        recurringTransaction.id,
+        dueCycles[dueCycles.length - 1],
+      );
+    }
+
+    return {
+      recurringTransaction:
+        (await this.findByIdAndUser(
+          recurringTransaction.id,
+          recurringTransaction.userId,
+        )) ?? recurringTransaction,
+      createdTransactions,
+    };
   }
 
   async update(

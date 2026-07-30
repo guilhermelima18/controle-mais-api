@@ -4,6 +4,7 @@ import { TransactionType } from "../../transactions/entities/transaction";
 import { RecurringTransactionFrequency } from "../entities/recurring-transaction";
 import { CategoryNotFoundError } from "./errors/category-not-found-error";
 import { InvalidEndDateError } from "./errors/invalid-end-date-error";
+import { calculateDueCycles } from "./calculate-due-cycles";
 
 type CreateRecurringTransactionUseCaseRequest = {
   description: string;
@@ -14,6 +15,7 @@ type CreateRecurringTransactionUseCaseRequest = {
   endDate?: string;
   userId: string;
   categoryId: string;
+  referenceDate?: Date;
 };
 
 export class CreateRecurringTransactionUseCase {
@@ -22,7 +24,10 @@ export class CreateRecurringTransactionUseCase {
     private categoriesRepository: ICategoriesRepository,
   ) {}
 
-  async execute(data: CreateRecurringTransactionUseCaseRequest) {
+  async execute({
+    referenceDate = new Date(),
+    ...data
+  }: CreateRecurringTransactionUseCaseRequest) {
     const category = await this.categoriesRepository.findById(
       data.categoryId,
     );
@@ -35,6 +40,21 @@ export class CreateRecurringTransactionUseCase {
       throw new InvalidEndDateError();
     }
 
-    return this.recurringTransactionsRepository.create(data);
+    // Antecipamos aqui os ciclos que o job geraria na próxima execução, para que o
+    // lançamento apareça no extrato na hora (FR-001 da 003). `lastGeneratedDate` é
+    // null porque a recorrência ainda não existe — a mesma função usada pelo job
+    // decide quais ciclos são devidos, o que garante a paridade exigida pelo FR-002.
+    const dueCycles = calculateDueCycles({
+      startDate: new Date(data.startDate),
+      lastGeneratedDate: null,
+      endDate: data.endDate ? new Date(data.endDate) : null,
+      frequency: data.frequency,
+      referenceDate,
+    });
+
+    return this.recurringTransactionsRepository.createWithDueTransactions(
+      data,
+      dueCycles,
+    );
   }
 }
