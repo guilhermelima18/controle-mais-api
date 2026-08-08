@@ -8,7 +8,12 @@ import {
 import { extractStatementText } from "../extract-statement-text";
 
 const DATE_PATTERN = /\d{4}-\d{2}-\d{2}|\d{2}\/\d{2}\/\d{4}/;
-const AMOUNT_PATTERN = /-?R?\$?\s*-?\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})/;
+// Alternativas em ordem: com separador de milhar por ponto (1.325,74), por vírgula
+// (1,325.74) e sem separador (3000,00 / -150.32) — a versão anterior, com apenas um
+// grupo opcional de milhar, "comia" os dígitos de milhar quando o número não tinha
+// separador (ex.: "3000,00" virava só "000,00").
+const AMOUNT_PATTERN =
+  /-?R?\$?\s*-?(?:\d{1,3}(?:\.\d{3})+,\d{2}|\d{1,3}(?:,\d{3})+\.\d{2}|\d+[.,]\d{2})/;
 
 /**
  * Parser sem IA usado como fallback quando o GPT-5-Mini falha ou estoura o limite de
@@ -147,6 +152,33 @@ function parseXlsx(fileBuffer: Buffer): ParsedTransaction[] {
   );
 }
 
+// Extratos em PDF (ex.: Neon) costumam listar Valor sem sinal, seguido do Saldo da
+// conta após o lançamento — a única forma de saber se é entrada ou saída é comparar o
+// Saldo com o da linha anterior, ou (na primeira linha, sem saldo anterior) recorrer a
+// palavras-chave da descrição.
+const INCOME_KEYWORDS = /receb|cr[ée]dito|dep[óo]sito|estorno|reembolso|resgate|sal[áa]rio/i;
+const EXPENSE_KEYWORDS = /enviad|pagamento|compra|d[ée]bito|saque|tarifa|fatura|boleto/i;
+
+function inferTypeFromDescription(
+  description: string,
+): ParsedTransaction["type"] | null {
+  if (EXPENSE_KEYWORDS.test(description)) return "EXPENSE";
+  if (INCOME_KEYWORDS.test(description)) return "INCOME";
+  return null;
+}
+
+function inferTypeFromBalanceDelta(
+  previousBalance: number | undefined,
+  currentBalance: number | undefined,
+): ParsedTransaction["type"] | null {
+  if (previousBalance === undefined || currentBalance === undefined) return null;
+
+  const delta = currentBalance - previousBalance;
+  if (Math.abs(delta) < 0.005) return null;
+
+  return delta > 0 ? "INCOME" : "EXPENSE";
+}
+
 function parseGenericText(text: string): ParsedTransaction[] {
   const transactions: ParsedTransaction[] = [];
 
@@ -155,24 +187,38 @@ function parseGenericText(text: string): ParsedTransaction[] {
     .map((line) => line.trim())
     .filter((line) => line.length > 0);
 
+  let previousBalance: number | undefined;
+
   for (const line of lines) {
     const dateMatch = line.match(DATE_PATTERN);
-    const amountMatch = line.match(AMOUNT_PATTERN);
-    if (!dateMatch || !amountMatch) continue;
+    const amountMatches = [...line.matchAll(new RegExp(AMOUNT_PATTERN.source, "g"))];
+    if (!dateMatch || amountMatches.length === 0) continue;
 
-    const amount = parseAmount(amountMatch[0]);
-    if (Number.isNaN(amount)) continue;
+    const valorRaw = amountMatches[0][0];
+    const signedAmount = parseAmount(valorRaw);
+    if (Number.isNaN(signedAmount) || signedAmount === 0) continue;
 
-    const description = line
-      .replace(dateMatch[0], "")
-      .replace(amountMatch[0], "")
-      .trim();
+    const saldoRaw = amountMatches[1]?.[0];
+    const currentBalance = saldoRaw ? parseAmount(saldoRaw) : undefined;
+
+    let description = line.replace(dateMatch[0], "").replace(valorRaw, "");
+    if (saldoRaw) description = description.replace(saldoRaw, "");
+    description = description.replace(/-\s*$/, "").trim();
+
+    const type: ParsedTransaction["type"] =
+      signedAmount < 0
+        ? "EXPENSE"
+        : (inferTypeFromBalanceDelta(previousBalance, currentBalance) ??
+          inferTypeFromDescription(description) ??
+          "INCOME");
+
+    if (currentBalance !== undefined) previousBalance = currentBalance;
 
     transactions.push({
       date: toIsoDate(dateMatch[0]),
       description,
-      amount: Math.abs(amount),
-      type: inferType(amount),
+      amount: Math.abs(signedAmount),
+      type,
     });
   }
 

@@ -12,4 +12,6 @@ export const env = {
     process.env.STATEMENT_IMPORT_MAX_FILE_SIZE_BYTES ?? 10 * 1024 * 1024,
   ),
   useFakeAiProvider: process.env.STATEMENT_IMPORT_USE_FAKE_AI_PROVIDER === "true",
+  useDeterministicStatementParserOnly:
+    process.env.STATEMENT_IMPORT_USE_DETERMINISTIC_PARSER_ONLY === "true",
 };

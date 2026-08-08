@@ -92,6 +92,29 @@ describe("DeterministicStatementFileParser", () => {
     });
   });
 
+  it("infere entrada/saída pela variação do saldo quando o valor não tem sinal (ex.: extrato Neon em PDF)", async () => {
+    const txt = Buffer.from(
+      [
+        "Resgate em Cofrinho11/07/2026 R$ 70,00R$ 72,50-",
+        "PIX enviado para IFOOD11/07/2026 R$ 68,18R$ 4,32-",
+        "PIX recebido de FULANO12/07/2026 R$ 1.000,00R$ 1.004,32-",
+        "POSTO ANA CLAUDINA12/07/2026 R$ 50,00R$ 954,32-",
+      ].join("\n"),
+    );
+
+    const result = await sut.parse(txt, "TXT", []);
+
+    expect(result.transactions).toHaveLength(4);
+    expect(result.transactions.map((t) => t.type)).toEqual([
+      "INCOME", // sem saldo anterior, cai na palavra-chave "Resgate"
+      "EXPENSE", // saldo caiu de 72,50 para 4,32
+      "INCOME", // saldo subiu de 4,32 para 1.004,32
+      "EXPENSE", // saldo caiu de 1.004,32 para 954,32
+    ]);
+    expect(result.transactions[0].amount).toEqual(70);
+    expect(result.transactions[2].amount).toEqual(1000);
+  });
+
   it("retorna lista vazia para PDF sem camada de texto (escaneado), sem lançar erro", async () => {
     pdfParseMock.mockResolvedValueOnce({ text: "" });
     const result = await sut.parse(Buffer.from("pdf bytes"), "PDF", []);

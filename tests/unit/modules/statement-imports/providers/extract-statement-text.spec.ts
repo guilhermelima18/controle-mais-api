@@ -52,4 +52,11 @@ describe("extractStatementText", () => {
       extractStatementText(Buffer.from("pdf bytes corrompidos"), "PDF"),
     ).rejects.toThrow("bad XRef entry");
   });
+
+  it("remove bytes nulos do texto (Postgres rejeita 0x00 em colunas de texto)", async () => {
+    const bufferWithNullBytes = Buffer.from("2026-07-01\u0000,Mercado\u0000,100.00");
+    const text = await extractStatementText(bufferWithNullBytes, "TXT");
+    expect(text).not.toContain("\u0000");
+    expect(text).toEqual("2026-07-01,Mercado,100.00");
+  });
 });

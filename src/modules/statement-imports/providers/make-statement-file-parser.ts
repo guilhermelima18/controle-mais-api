@@ -16,6 +16,10 @@ export function makeStatementFileParser(): IStatementFileParser {
     return new FakeStatementFileParser();
   }
 
+  if (env.useDeterministicStatementParserOnly) {
+    return new DeterministicStatementFileParser();
+  }
+
   const openaiClient = new OpenAI({ apiKey: env.openaiApiKey });
 
   return new StatementFileParserWithFallback(

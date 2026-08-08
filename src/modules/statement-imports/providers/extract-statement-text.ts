@@ -14,17 +14,26 @@ export async function extractStatementText(
 ): Promise<string> {
   if (format === "PDF") {
     const result = await pdfParse(fileBuffer);
-    return result.text.trim();
+    return stripNullBytes(result.text.trim());
   }
 
   if (format === "XLSX") {
     const workbook = XLSX.read(fileBuffer, { type: "buffer" });
-    return workbook.SheetNames.map((sheetName) =>
-      XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]),
-    ).join("\n");
+    return stripNullBytes(
+      workbook.SheetNames.map((sheetName) =>
+        XLSX.utils.sheet_to_csv(workbook.Sheets[sheetName]),
+      ).join("\n"),
+    );
   }
 
-  return decodeText(fileBuffer);
+  return stripNullBytes(decodeText(fileBuffer));
+}
+
+// Postgres rejeita `0x00` em colunas de texto ("invalid byte sequence for encoding
+// UTF8: 0x00"). Formatos legados de extrato (BBT/TXT de largura fixa) costumam usar
+// padding com bytes nulos, e extrações de PDF/XLSX corrompidos também podem introduzi-los.
+function stripNullBytes(text: string): string {
+  return text.replace(/\u0000/g, "");
 }
 
 function decodeText(fileBuffer: Buffer): string {
