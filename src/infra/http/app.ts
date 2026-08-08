@@ -2,10 +2,13 @@ import Fastify, { FastifyReply, FastifyRequest } from "fastify";
 import cors from "@fastify/cors";
 import fastifyJwt from "@fastify/jwt";
 import fastifyMultipart from "@fastify/multipart";
+import fastifySwagger from "@fastify/swagger";
+import fastifySwaggerUi from "@fastify/swagger-ui";
 
 import { env } from "../../config/env";
 import { AppError } from "../../core/errors/app-error";
 import { ensureAuthenticated } from "../@shared/middlewares/ensure-authenticated";
+import { openapiDocument } from "./docs/openapi-document";
 
 import { authRoutes } from "../../modules/auth/infra/http/routes";
 import { usersRoutes } from "../../modules/users/infra/http/routes";
@@ -23,6 +26,14 @@ app.register(fastifyJwt, {
 });
 app.register(fastifyMultipart, {
   limits: { fileSize: env.statementImportMaxFileSizeBytes },
+});
+
+app.register(fastifySwagger, {
+  mode: "static",
+  specification: { document: openapiDocument as any },
+});
+app.register(fastifySwaggerUi, {
+  routePrefix: "/docs",
 });
 
 app.decorate("authenticate", ensureAuthenticated);

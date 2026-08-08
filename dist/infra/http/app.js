@@ -8,9 +8,12 @@ const fastify_1 = __importDefault(require("fastify"));
 const cors_1 = __importDefault(require("@fastify/cors"));
 const jwt_1 = __importDefault(require("@fastify/jwt"));
 const multipart_1 = __importDefault(require("@fastify/multipart"));
+const swagger_1 = __importDefault(require("@fastify/swagger"));
+const swagger_ui_1 = __importDefault(require("@fastify/swagger-ui"));
 const env_1 = require("../../config/env");
 const app_error_1 = require("../../core/errors/app-error");
 const ensure_authenticated_1 = require("../@shared/middlewares/ensure-authenticated");
+const openapi_document_1 = require("./docs/openapi-document");
 const routes_1 = require("../../modules/auth/infra/http/routes");
 const routes_2 = require("../../modules/users/infra/http/routes");
 const routes_3 = require("../../modules/categories/infra/http/routes");
@@ -25,6 +28,13 @@ exports.app.register(jwt_1.default, {
 });
 exports.app.register(multipart_1.default, {
     limits: { fileSize: env_1.env.statementImportMaxFileSizeBytes },
+});
+exports.app.register(swagger_1.default, {
+    mode: "static",
+    specification: { document: openapi_document_1.openapiDocument },
+});
+exports.app.register(swagger_ui_1.default, {
+    routePrefix: "/docs",
 });
 exports.app.decorate("authenticate", ensure_authenticated_1.ensureAuthenticated);
 // Rotas

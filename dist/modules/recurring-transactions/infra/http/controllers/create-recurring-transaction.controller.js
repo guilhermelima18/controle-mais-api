@@ -19,7 +19,7 @@ class CreateRecurringTransactionController {
         const recurringTransactionsRepository = new prisma_recurring_transactions_repository_1.PrismaRecurringTransactionsRepository();
         const categoriesRepository = new prisma_categories_repository_1.PrismaCategoriesRepository();
         const createRecurringTransactionUseCase = new create_recurring_transaction_1.CreateRecurringTransactionUseCase(recurringTransactionsRepository, categoriesRepository);
-        await createRecurringTransactionUseCase.execute({
+        const { recurringTransaction, createdTransactions } = await createRecurringTransactionUseCase.execute({
             description: data.description,
             amount: data.amount,
             type: data.type,
@@ -29,9 +29,12 @@ class CreateRecurringTransactionController {
             userId: request.user.sub,
             categoryId: data.categoryId,
         });
-        return reply
-            .code(201)
-            .send({ success: true, message: "Recorrência criada com sucesso!" });
+        return reply.code(201).send({
+            success: true,
+            message: "Recorrência criada com sucesso!",
+            recurringTransaction,
+            createdTransactions,
+        });
     }
 }
 exports.CreateRecurringTransactionController = CreateRecurringTransactionController;
