@@ -19,7 +19,6 @@ import { statementImportsRoutes } from "../../modules/statement-imports/infra/ht
 
 export const app = Fastify();
 
-// Plugins
 app.register(cors);
 app.register(fastifyJwt, {
   secret: env.jwtSecret,
